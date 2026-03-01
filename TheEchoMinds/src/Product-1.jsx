@@ -1,9 +1,16 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext.jsx";
 
 export default function Product() {
   const navigate = useNavigate();
+  const { isLoggedIn, logout } = useAuth();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="relative min-h-screen text-white">
@@ -39,13 +46,24 @@ export default function Product() {
                   need it.
                 </p>
               </div>
-              <Button
-                variant="outline"
-                className="rounded-full px-6 py-5"
-                onClick={() => navigate("/")}
-              >
-                Back to home
-              </Button>
+              <div className="flex items-center gap-3">
+                {isLoggedIn && (
+                  <Button
+                    variant="outline"
+                    className="rounded-full px-6 py-5"
+                    onClick={() => logout(navigate)}
+                  >
+                    Logout
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  className="rounded-full px-6 py-5"
+                  onClick={() => navigate("/")}
+                >
+                  Back to home
+                </Button>
+              </div>
             </motion.div>
           </div>
         </section>
@@ -62,7 +80,7 @@ export default function Product() {
             >
               <div className="rounded-3xl overflow-hidden bg-black/40 border border-white/10">
                 <img
-                  src="/public/smartglass/NLB08-sunglasses(5).png"
+                  src="/smartglass/NLB08-sunglasses(5).png"
                   alt="EchoLens product view"
                   className="w-full h-full object-contain"
                 />
@@ -88,11 +106,25 @@ export default function Product() {
                     <span>Memory</span>
                     <span className="text-white">32Gb</span>
                   </div>
+                  <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-4">
+                    <span>Price</span>
+                    <span className="text-xl font-semibold text-white">₹11,999</span>
+                  </div>
                 </div>
                 <Button
                   className="mt-8 w-full rounded-full"
                   variant="default"
-                  onClick={() => navigate("/preorder")}
+                  onClick={() =>
+                    navigate("/checkout", {
+                      state: {
+                        product: {
+                          name: "EchoLens G.1",
+                          model: "Lens G1",
+                          amount: 11999,
+                        },
+                      },
+                    })
+                  }
                 >
                   Order now
                 </Button>
@@ -110,7 +142,7 @@ export default function Product() {
               >
                 <div className="md:w-1/2 w-full h-48 md:h-auto bg-black/60">
                   <img
-                    src="/public/smartglass/NLB08-sunglasses(2).png"
+                    src="/smartglass/NLB08-sunglasses(2).png"
                     alt="Camera specification"
                     className="w-full h-full object-contain"
                   />
@@ -242,12 +274,12 @@ export default function Product() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {[
-                "/public/smartglass/NLB08-sunglasses (1).png",
-                "/public/smartglass/NLB08-sunglasses(2).png",
-                "/public/smartglass/NLB08-sunglasses (3).png",
-                "/public/smartglass/NLB08-sunglasses (4).png",
-                "/public/smartglass/NLB08-sunglasses(5).png",
-                "/public/smartglass/NLB08-sunglasses (6).png",
+                "/smartglass/NLB08-sunglasses (1).png",
+                "/smartglass/NLB08-sunglasses(2).png",
+                "/smartglass/NLB08-sunglasses (3).png",
+                "/smartglass/NLB08-sunglasses (4).png",
+                "/smartglass/NLB08-sunglasses(5).png",
+                "/smartglass/NLB08-sunglasses (6).png",
               ].map((src, index) => (
                 <motion.div
                   key={src}

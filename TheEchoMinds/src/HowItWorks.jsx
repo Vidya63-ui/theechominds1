@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext.jsx";
 
 export default function HowItWorksPage() {
   const navigate = useNavigate();
+  const { isLoggedIn, logout } = useAuth();
 
   const steps = [
     {
@@ -40,6 +42,11 @@ export default function HowItWorksPage() {
               <Button className="rounded-full" onClick={() => navigate("/preorder")}>
                 Pre-order
               </Button>
+              {isLoggedIn && (
+                <Button variant="outline" className="rounded-full" onClick={() => logout(navigate)}>
+                  Logout
+                </Button>
+              )}
             </div>
           </div>
         </header>

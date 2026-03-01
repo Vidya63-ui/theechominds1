@@ -1,9 +1,16 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext.jsx";
 
 export default function Product() {
   const navigate = useNavigate();
+  const { isLoggedIn, logout } = useAuth();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="relative min-h-screen text-white">
@@ -32,20 +39,31 @@ export default function Product() {
               transition={{ duration: 0.6 }}
             >
               <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-gray-400">EchoLens L.1</p>
+                <p className="text-sm uppercase tracking-[0.3em] text-gray-400">EchoLens S.1</p>
                 <h1 className="text-4xl md:text-6xl font-semibold mt-3">Product details</h1>
                 <p className="text-gray-300 mt-4 max-w-2xl">
-                  A clean, lightweight build with intelligence that stays out of the way until you
-                  need it.
+                  Designed for the spectacles category, combining comfort with advanced AI features for
+                  daily wear. Featherlight frame and intuitive controls for all-day use.
                 </p>
               </div>
-              <Button
-                variant="outline"
-                className="rounded-full px-6 py-5"
-                onClick={() => navigate("/")}
-              >
-                Back to home
-              </Button>
+              <div className="flex items-center gap-3">
+                {isLoggedIn && (
+                  <Button
+                    variant="outline"
+                    className="rounded-full px-6 py-5"
+                    onClick={() => logout(navigate)}
+                  >
+                    Logout
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  className="rounded-full px-6 py-5"
+                  onClick={() => navigate("/")}
+                >
+                  Back to home
+                </Button>
+              </div>
             </motion.div>
           </div>
         </section>
@@ -62,18 +80,18 @@ export default function Product() {
             >
               <div className="rounded-3xl overflow-hidden bg-black/40 border border-white/10">
                 <img
-                  src="/public/smartglass/NLB08-sunglasses(5).png"
+                  src="/smartglass/NLB08-sunglasses(5).png"
                   alt="EchoLens product view"
                   className="w-full h-full object-contain"
                 />
               </div>
 
               <div className="bg-black/60 backdrop-blur-md rounded-3xl p-8 border border-white/10">
-                <h2 className="text-2xl md:text-3xl font-medium mb-4">Designed for all-day wear</h2>
+                <h2 className="text-2xl md:text-3xl font-medium mb-4">Designed for spectacles</h2>
                 <p className="text-gray-300 leading-relaxed">
-                  EchoLens pairs a refined silhouette with balanced weight distribution, so it feels
-                  invisible even during long sessions. The lenses and frame are tuned for clarity and
-                  comfort across every environment.
+                  EchoLens S.1 brings AI-powered features into a classic spectacles form factor. Lightweight
+                  and comfortable for everyday wear, with lenses tuned for clarity across work, travel,
+                  and daily activities.
                 </p>
                 <div className="mt-8 grid gap-3 text-sm text-gray-300">
                   <div className="flex items-center justify-between border-b border-white/10 pb-2">
@@ -94,7 +112,7 @@ export default function Product() {
                   variant="default"
                   onClick={() => navigate("/preorder")}
                 >
-                  Pre-Order now
+                  Pre-order
                 </Button>
               </div>
             </motion.div>
@@ -110,7 +128,7 @@ export default function Product() {
               >
                 <div className="md:w-1/2 w-full h-48 md:h-auto bg-black/60">
                   <img
-                    src="/public/smartglass/NLB08-sunglasses(2).png"
+                    src="/smartglass/NLB08-sunglasses(2).png"
                     alt="Camera specification"
                     className="w-full h-full object-contain"
                   />
@@ -236,18 +254,18 @@ export default function Product() {
             >
               <h2 className="text-2xl md:text-3xl font-medium mb-3">Photo gallery</h2>
               <p className="text-gray-300 text-sm md:text-base">
-                A closer look at EchoLens smart glasses from every angle.
+                A closer look at EchoLens S.1 smart glasses from every angle.
               </p>
             </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {[
-                "/public/smartglass/NLB08-sunglasses (1).png",
-                "/public/smartglass/NLB08-sunglasses(2).png",
-                "/public/smartglass/NLB08-sunglasses (3).png",
-                "/public/smartglass/NLB08-sunglasses (4).png",
-                "/public/smartglass/NLB08-sunglasses(5).png",
-                "/public/smartglass/NLB08-sunglasses (6).png",
+                "/smartglass/NLB08-sunglasses (1).png",
+                "/smartglass/NLB08-sunglasses(2).png",
+                "/smartglass/NLB08-sunglasses (3).png",
+                "/smartglass/NLB08-sunglasses (4).png",
+                "/smartglass/NLB08-sunglasses(5).png",
+                "/smartglass/NLB08-sunglasses (6).png",
               ].map((src, index) => (
                 <motion.div
                   key={src}

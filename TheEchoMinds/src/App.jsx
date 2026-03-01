@@ -3,13 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext.jsx";
 
 export default function EchoLensWebsite() {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
+  const { isLoggedIn, logout } = useAuth();
 
   const goWithAuth = (pathIfLoggedIn = "/preorder") => {
-    navigate(localStorage.getItem("token") ? pathIfLoggedIn : "/login");
+    navigate(pathIfLoggedIn);
   };
 
   const features = [
@@ -40,6 +42,11 @@ export default function EchoLensWebsite() {
               <Button className="rounded-full" onClick={() => navigate("/about")}>
                 About
               </Button>
+              {isLoggedIn && (
+                <Button variant="outline" className="rounded-full" onClick={() => logout(navigate)}>
+                  Logout
+                </Button>
+              )}
             </div>
           </div>
         </header>
@@ -200,12 +207,13 @@ export default function EchoLensWebsite() {
               transition={{ duration: 0.8, ease: "easeOut" }}
               viewport={{ once: true, margin: "-100px" }}
             >
-              <motion.h2 className="text-3xl md:text-4xl font-medium mb-6">EchoLens L.1</motion.h2>
+              <motion.h2 className="text-3xl md:text-4xl font-medium mb-6">EchoLens S.1</motion.h2>
               <motion.p className="text-gray-200 mb-6">
-                Lens G1 extends the same AI core into a more immersive form factor for high-motion and utility-heavy environments.
+                Designed for the spectacles category, combining comfort with advanced AI features for
+                daily wear. Featherlight frame and intuitive controls for seamless all-day use.
               </motion.p>
               <motion.p className="text-gray-300 text-sm md:text-base mb-6">
-                Compare both categories and choose the one that matches your daily use case.
+                Explore the spectacles lineup and see how S.1 fits into your day.
               </motion.p>
               <Button className="rounded-full px-8" onClick={() => navigate("/product-2")}>View product</Button>
             </motion.div>
@@ -217,13 +225,13 @@ export default function EchoLensWebsite() {
               viewport={{ once: true, margin: "-100px" }}
             >
               <div className="col-span-1 rounded-2xl overflow-hidden bg-black/40 flex items-center justify-center">
-                <img src="/smartglass/NLB08-sunglasses (1).png" alt="Lens G1 front view" className="w-full h-full object-cover" />
+                <img src="/smartglass/NLB08-sunglasses (1).png" alt="EchoLens S.1 front view" className="w-full h-full object-cover" />
               </div>
               <div className="col-span-1 rounded-2xl overflow-hidden bg-black/40 flex items-center justify-center">
-                <img src="/smartglass/NLB08-sunglasses (6).png" alt="Lens G1 side view" className="w-full h-full object-cover" />
+                <img src="/smartglass/NLB08-sunglasses (6).png" alt="EchoLens S.1 side view" className="w-full h-full object-cover" />
               </div>
               <div className="col-span-2 rounded-2xl overflow-hidden bg-black/40 flex items-center justify-center">
-                <img src="/images/rbm-case-data.webp" alt="Lens G1 accessories" className="w-full h-full object-cover" />
+                <img src="/images/rbm-case-data.webp" alt="EchoLens S.1 accessories" className="w-full h-full object-cover" />
               </div>
             </motion.div>
           </div>

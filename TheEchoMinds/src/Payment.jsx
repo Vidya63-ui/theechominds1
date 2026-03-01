@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { apiFetch, getToken } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
 
 export default function PaymentPage() {
   const { preorderId } = useParams();
@@ -18,9 +18,7 @@ export default function PaymentPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!getToken()) {
-      navigate("/login");
-    }
+    apiFetch("/auth/me").catch(() => navigate("/login"));
   }, [navigate]);
 
   async function submit(e) {

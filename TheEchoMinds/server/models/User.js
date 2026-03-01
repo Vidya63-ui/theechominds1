@@ -14,12 +14,31 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    passwordHash: {
+    phone: {
       type: String,
       required: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    otp: {
+      type: String,
+      default: null,
+    },
+    otpExpiry: {
+      type: Date,
+      default: null,
     },
   },
   { timestamps: true },
 );
+
+userSchema.index({ phone: 1 });
 
 export const User = mongoose.model("User", userSchema);

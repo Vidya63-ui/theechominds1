@@ -1,13 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext.jsx";
 
 export default function AboutPage() {
   const navigate = useNavigate();
+  const { isLoggedIn, logout } = useAuth();
 
   return (
     <div className="relative min-h-screen text-white">
-      <div className="fixed inset-0 z-0 overflow-hidden">
+      <div className="fixed inset-0 z-0 overflow-hidden blur-md">
         <video
           autoPlay
           loop
@@ -33,6 +35,11 @@ export default function AboutPage() {
               <Button className="rounded-full" onClick={() => navigate("/about")}>
                 About
               </Button>
+              {isLoggedIn && (
+                <Button variant="outline" className="rounded-full" onClick={() => logout(navigate)}>
+                  Logout
+                </Button>
+              )}
             </div>
           </div>
         </header>
@@ -87,7 +94,7 @@ export default function AboutPage() {
               <h3 className="text-xl font-semibold text-white">Corporate Information</h3>
               <p>The EchoMinds operates under Lefflex LLP.</p>
               <p>
-                Lefflex LLP
+                Registered Office :
                 <br />
                 Palam Vihar Extension
                 <br />
@@ -95,12 +102,32 @@ export default function AboutPage() {
                 <br />
                 India
               </p>
+              <br />
+              <p>
+                Assembly Unit And Warehouse :
+                <br />
+                Devanahalli, Southegowdanahalli
+                <br />
+                Bangalore, Karnataka 562110
+                <br />
+                India
+              </p>
+              <br/>
               <p>LLP Identification Number (LLPIN): ACQ-2686</p>
+              <br />
               <p>Founder: Piyush Karn</p>
               <p>
                 Email:{" "}
                 <a className="text-white hover:underline" href="mailto:piyushkarn@lefflex.com">
                   piyushkarn@lefflex.com
+                </a>
+              </p>
+              <br />
+              <p>Co-Founder: Rishav Raj</p>
+              <p>
+                Email:{" "}
+                <a className="text-white hover:underline" href="mailto:rishav@theechominds.com">
+                  rishav@theechominds.com
                 </a>
               </p>
             </motion.div>

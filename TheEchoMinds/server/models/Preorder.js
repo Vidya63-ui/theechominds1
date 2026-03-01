@@ -2,44 +2,29 @@ import mongoose from "mongoose";
 
 const preorderSchema = new mongoose.Schema(
   {
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    fullName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: true,
-      lowercase: true,
-      trim: true,
-    },
-    phone: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    model: {
-      type: String,
-      enum: ["Lens S1", "Lens G1"],
+    product: {
+      type: mongoose.Schema.Types.Mixed,
       required: true,
     },
-    city: {
+    preorderId: {
       type: String,
-      default: "",
-      trim: true,
+      required: true,
+      unique: true,
     },
-    paymentStatus: {
+    status: {
       type: String,
-      enum: ["pending", "submitted"],
+      enum: ["pending", "confirmed"],
       default: "pending",
     },
   },
   { timestamps: true },
 );
+
+preorderSchema.index({ userId: 1 });
 
 export const Preorder = mongoose.model("Preorder", preorderSchema);
