@@ -14,24 +14,27 @@ const app = express();
 const port = process.env.PORT || 5000;
 let dbReady = false;
 
-const allowedOrigins = (process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(",").map((v) => v.trim())
-  : ["http://localhost:5173", "http://127.0.0.1:5173"]).filter(Boolean);
+const allowedOrigins = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((v) => v.trim())
+  .filter(Boolean);
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
+const corsOptions = {
+  origin(origin, callback) {
+    // Mobile app / curl / Postman can have no Origin header
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
-app.options("*", cors());
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
