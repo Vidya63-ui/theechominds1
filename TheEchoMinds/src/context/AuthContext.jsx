@@ -1,5 +1,11 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { apiFetch } from "@/lib/api";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { apiFetch, clearToken } from "@/lib/api";
 
 const AuthContext = createContext(null);
 
@@ -7,30 +13,34 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    apiFetch("/auth/me")
-      .then((data) => setUser(data.user))
-      .catch(() => setUser(null))
+  const refreshAuth = useCallback(() => {
+    setLoading(true);
+    return apiFetch("/auth/me")
+      .then((data) => {
+        setUser(data.user);
+        return data;
+      })
+      .catch((err) => {
+        setUser(null);
+        throw err;
+      })
       .finally(() => setLoading(false));
   }, []);
 
-  async function logout(navigate) {
+  useEffect(() => {
+    refreshAuth().catch(() => {});
+  }, [refreshAuth]);
+
+  const logout = useCallback(async (navigate) => {
     try {
       await apiFetch("/auth/logout", { method: "POST" });
     } catch (_err) {
       /* ignore */
     }
+    clearToken();
     setUser(null);
     if (navigate) navigate("/");
-  }
-
-  function refreshAuth() {
-    setLoading(true);
-    apiFetch("/auth/me")
-      .then((data) => setUser(data.user))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, isLoggedIn: !!user, loading, logout, refreshAuth }}>

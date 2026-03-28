@@ -5,23 +5,11 @@ import { generateOtp } from "../utils/generateOtp.js";
 import { sendOtpEmail } from "../services/emailService.js";
 import { success, error } from "../utils/response.js";
 
-const COOKIE_NAME = "token";
 const OTP_EXPIRY_MINUTES = 10;
 const JWT_EXPIRY = "7d";
-const isProd = process.env.NODE_ENV === "production";
 
 function signToken(userId) {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: JWT_EXPIRY });
-}
-
-function setTokenCookie(res, token) {
-  res.cookie(COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    path: "/",
-  });
 }
 
 export async function signup(req, res) {
@@ -134,9 +122,10 @@ export async function login(req, res) {
     }
 
     const token = signToken(user._id.toString());
-    setTokenCookie(res, token);
 
     return success(res, {
+      message: "Login successful",
+      token,
       user: {
         id: user._id,
         name: user.name,
@@ -224,10 +213,10 @@ export async function verifyOtp(req, res) {
     await user.save();
 
     const token = signToken(user._id.toString());
-    setTokenCookie(res, token);
 
     return success(res, {
       message: "Email verified successfully",
+      token,
       user: {
         id: user._id,
         name: user.name,
@@ -255,12 +244,6 @@ export async function me(req, res) {
   });
 }
 
-export async function logout(req, res) {
-  res.clearCookie(COOKIE_NAME, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",
-  });
+export async function logout(_req, res) {
   return success(res, { message: "Logged out" });
 }

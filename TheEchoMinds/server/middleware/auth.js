@@ -1,18 +1,10 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/User.js";
 
-const COOKIE_NAME = "token";
-
-/** Extract JWT from httpOnly cookie or Authorization header (fallback) */
 function getToken(req) {
-  if (req.cookies && req.cookies[COOKIE_NAME]) {
-    return req.cookies[COOKIE_NAME];
-  }
-  const authHeader = req.headers.authorization || "";
-  if (authHeader.startsWith("Bearer ")) {
-    return authHeader.slice(7);
-  }
-  return null;
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) return null;
+  return authHeader.split(" ")[1];
 }
 
 /** Require valid JWT - user must be logged in */
@@ -62,5 +54,3 @@ export async function requireVerified(req, res, next) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 }
-
-export { COOKIE_NAME };

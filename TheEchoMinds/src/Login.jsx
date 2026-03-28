@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, setToken } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext.jsx";
 
 export default function LoginPage() {
@@ -23,7 +23,26 @@ export default function LoginPage() {
   const [cameFromLogin, setCameFromLogin] = useState(false);
   const [resendingOtp, setResendingOtp] = useState(false);
   const navigate = useNavigate();
-  const { refreshAuth } = useAuth();
+  const location = useLocation();
+  const { refreshAuth, isLoggedIn, logout } = useAuth();
+
+  function navigateAfterAuthSuccess() {
+    const st = location.state;
+    const redirectTo = st?.redirectTo;
+    const product = st?.product;
+    if (redirectTo === "/checkout") {
+      navigate("/checkout", {
+        replace: true,
+        state: product?.name || product?.amount ? { product } : {},
+      });
+      return;
+    }
+    if (typeof redirectTo === "string" && redirectTo.startsWith("/")) {
+      navigate(redirectTo, { replace: true });
+      return;
+    }
+    navigate("/preorder", { replace: true });
+  }
 
   async function handleResendOtp() {
     if (!pendingEmail) return;
@@ -47,7 +66,7 @@ export default function LoginPage() {
     async function checkBackend() {
       try {
         const base = import.meta.env.VITE_API_URL ?? "/api";
-        const response = await fetch(`${base}/health`, { credentials: "include" });
+        const response = await fetch(`${base}/health`);
         const data = await response.json();
         if (!mounted) return;
         if (response.ok && data.ok && data.db) setBackendStatus("ready");
@@ -58,7 +77,9 @@ export default function LoginPage() {
       }
     }
     checkBackend();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   async function onSubmit(e) {
@@ -68,12 +89,13 @@ export default function LoginPage() {
     setLoading(true);
     try {
       if (mode === "verify-otp") {
-        await apiFetch("/auth/verify-otp", {
+        const verified = await apiFetch("/auth/verify-otp", {
           method: "POST",
           body: JSON.stringify({ email: pendingEmail, otp: form.otp }),
         });
-        refreshAuth();
-        navigate("/preorder");
+        if (verified.token) setToken(verified.token);
+        await refreshAuth();
+        navigateAfterAuthSuccess();
         return;
       }
       if (mode === "login") {
@@ -94,8 +116,9 @@ export default function LoginPage() {
           setSuccessMessage(result.message || "Verification code sent! Check your email.");
           return;
         }
-        refreshAuth();
-        navigate("/preorder");
+        if (result.token) setToken(result.token);
+        await refreshAuth();
+        navigateAfterAuthSuccess();
         return;
       }
       if (mode === "register") {
@@ -133,58 +156,75 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/70" />
       </div>
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
-        <motion.form
-          onSubmit={onSubmit}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md rounded-3xl border border-white/20 bg-black/50 backdrop-blur-md p-8 space-y-4"
-        >
-          <h1 className="text-2xl font-semibold">
-            {isOtpStep ? "Verify email" : mode === "login" ? "Login" : "Create account"}
-          </h1>
-
-          {isOtpStep ? (
-            <>
-              {successMessage && (
-                <p className="text-sm text-emerald-300">{successMessage}</p>
+      <div className="relative z-10 flex min-h-screen flex-col">
+        <header className="sticky top-0 z-20 px-6 py-4 border-b border-white/10 bg-black/30 backdrop-blur-md">
+          <div className="max-w-6xl mx-auto flex items-center justify-between">
+            <h1 className="text-lg md:text-xl font-semibold tracking-wide">Sign in</h1>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" className="rounded-full" onClick={() => navigate("/")}>
+                Home
+              </Button>
+              {isLoggedIn && (
+                <Button variant="outline" className="rounded-full" onClick={() => logout(navigate)}>
+                  Logout
+                </Button>
               )}
-              <p className="text-sm text-gray-300">Enter the 6-digit verification code sent to</p>
-              <p className="text-sm font-medium text-white">{pendingEmail}</p>
-              <input
-                required
-                placeholder="6-digit OTP"
-                maxLength={6}
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                value={form.otp}
-                onChange={(e) => setForm({ ...form, otp: e.target.value.replace(/\D/g, "") })}
-                className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-center text-lg tracking-[0.5em] outline-none focus:border-white/60"
-              />
-              <div className="flex flex-col gap-2">
-                <button
-                  type="button"
-                  className="text-sm text-cyan-300 hover:text-cyan-200 disabled:opacity-50"
-                  onClick={handleResendOtp}
-                  disabled={resendingOtp}
-                >
-                  {resendingOtp ? "Sending..." : "Didn't receive the code? Resend"}
-                </button>
-                <button
-                  type="button"
-                  className="text-sm text-gray-300 hover:text-white"
-                  onClick={() => {
-                    setMode(cameFromLogin ? "login" : "register");
-                    setStep("form");
-                    setSuccessMessage("");
-                  }}
-                >
-                  {cameFromLogin ? "Back to login" : "Change email"}
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
+            </div>
+          </div>
+        </header>
+
+        <div className="flex flex-1 items-center justify-center px-4 py-10">
+          <motion.form
+            onSubmit={onSubmit}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-md rounded-3xl border border-white/20 bg-black/50 backdrop-blur-md p-8 space-y-4"
+          >
+            <h1 className="text-2xl font-semibold">
+              {isOtpStep ? "Verify email" : mode === "login" ? "Login" : "Create account"}
+            </h1>
+
+            {isOtpStep ? (
+              <>
+                {successMessage && (
+                  <p className="text-sm text-emerald-300">{successMessage}</p>
+                )}
+                <p className="text-sm text-gray-300">Enter the 6-digit verification code sent to</p>
+                <p className="text-sm font-medium text-white">{pendingEmail}</p>
+                <input
+                  required
+                  placeholder="6-digit OTP"
+                  maxLength={6}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  value={form.otp}
+                  onChange={(e) => setForm({ ...form, otp: e.target.value.replace(/\D/g, "") })}
+                  className="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-center text-lg tracking-[0.5em] outline-none focus:border-white/60"
+                />
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    className="text-sm text-cyan-300 hover:text-cyan-200 disabled:opacity-50"
+                    onClick={handleResendOtp}
+                    disabled={resendingOtp}
+                  >
+                    {resendingOtp ? "Sending..." : "Didn't receive the code? Resend"}
+                  </button>
+                  <button
+                    type="button"
+                    className="text-sm text-gray-300 hover:text-white"
+                    onClick={() => {
+                      setMode(cameFromLogin ? "login" : "register");
+                      setStep("form");
+                      setSuccessMessage("");
+                    }}
+                  >
+                    {cameFromLogin ? "Back to login" : "Change email"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
               {mode === "register" && (
                 <input
                   required
@@ -264,7 +304,8 @@ export default function LoginPage() {
               {mode === "login" ? "New user? Create account" : "Already have an account? Login"}
             </button>
           )}
-        </motion.form>
+          </motion.form>
+        </div>
       </div>
     </div>
   );

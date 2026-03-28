@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext.jsx";
 
 export default function PreorderPage() {
   const navigate = useNavigate();
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, refreshAuth } = useAuth();
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -19,8 +19,12 @@ export default function PreorderPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    apiFetch("/auth/me").catch(() => navigate("/login"));
-  }, [navigate]);
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    refreshAuth().catch(() => navigate("/login"));
+  }, [navigate, refreshAuth]);
 
   async function submit(e) {
     e.preventDefault();
@@ -48,15 +52,25 @@ export default function PreorderPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-zinc-900/70 to-black/60" />
       </div>
 
-      <header className="relative z-10 px-6 py-4 flex justify-end">
-        {isLoggedIn && (
-          <Button variant="outline" className="rounded-full" onClick={() => logout(navigate)}>
-            Logout
-          </Button>
-        )}
-      </header>
+      <div className="relative z-10">
+        <header className="sticky top-0 z-20 px-6 py-4 border-b border-white/10 bg-black/30 backdrop-blur-md">
+          <div className="max-w-6xl mx-auto flex items-center justify-between">
+            <h1 className="text-lg md:text-xl font-semibold tracking-wide">Pre-order</h1>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" className="rounded-full" onClick={() => navigate("/")}>
+                Home
+              </Button>
+              {isLoggedIn && (
+                <Button variant="outline" className="rounded-full" onClick={() => logout(navigate)}>
+                  Logout
+                </Button>
+              )}
+            </div>
+          </div>
+        </header>
+      </div>
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-10 -mt-16">
+      <div className="relative z-10 min-h-screen flex items-start justify-center px-4 pt-6 pb-16 md:pt-10">
         <motion.form
           onSubmit={submit}
           initial={{ opacity: 0, y: 20 }}

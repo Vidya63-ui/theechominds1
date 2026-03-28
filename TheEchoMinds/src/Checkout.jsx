@@ -49,8 +49,16 @@ export default function CheckoutPage() {
   useEffect(() => {
     apiFetch("/auth/me")
       .then(() => setAuthChecked(true))
-      .catch(() => navigate("/login"));
-  }, [navigate]);
+      .catch(() =>
+        navigate("/login", {
+          replace: true,
+          state: {
+            redirectTo: "/checkout",
+            product: location.state?.product,
+          },
+        })
+      );
+  }, [navigate, location.state]);
 
   const handlePayment = useCallback(async () => {
     setError("");
