@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ChevronRight, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const products = [
@@ -36,7 +36,7 @@ function ProductCard({ product, index, navigate }) {
   return (
     <motion.article
       id={product.id}
-      className="snap-center shrink-0 w-[min(20.5rem,90vw)] sm:w-[24rem] md:w-[28rem] scroll-mt-24 h-full"
+      className="scroll-mt-24 h-full w-full max-w-md mx-auto shrink-0 snap-none md:mx-0 md:max-w-none md:w-96 md:snap-center md:shrink-0 lg:w-[28rem]"
       initial={{ opacity: 0, y: 50, filter: "blur(8px)" }}
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true, amount: 0.2, margin: "-5%" }}
@@ -125,24 +125,20 @@ export default function ProductShowcase() {
             </h2>
             <p className="mt-3 sm:mt-4 text-gray-400 text-base sm:text-lg max-w-2xl sm:max-w-3xl mx-auto sm:mx-0">
               Goggles for immersive utility, or spectacles for all-day comfort.{" "}
-              <span className="text-white/40 hidden sm:inline">Scroll the row to compare both models.</span>
-            </p>
-            <p className="mt-3 flex sm:hidden items-center justify-center gap-1 text-xs text-gray-500">
-              <span>Swipe to explore</span>
-              <ChevronRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
+              <span className="text-white/40 hidden md:inline">Scroll the row to compare both models.</span>
             </p>
           </motion.div>
         </div>
       </div>
 
-      {/* Inner row is at least full width so two cards can center; grows with content for horizontal scroll on small viewports */}
+      {/* Small screens: stacked column so both products load in view; md+: horizontal strip with snap */}
       <div
-        className="blog-strip-scroll -mx-4 sm:-mx-6 max-w-6xl mx-auto overflow-x-auto overflow-y-visible scroll-smooth snap-x snap-mandatory pb-3"
+        className="blog-strip-scroll -mx-4 sm:-mx-6 max-w-6xl mx-auto max-md:overflow-x-visible md:overflow-x-auto md:overflow-y-visible md:scroll-smooth md:snap-x md:snap-mandatory pb-3"
         style={{ WebkitOverflowScrolling: "touch" }}
         role="list"
         aria-label="EchoLens product models"
       >
-        <div className="flex w-max min-w-full flex-nowrap items-stretch justify-center gap-5 sm:gap-6 md:gap-8 px-4 sm:px-6">
+        <div className="flex max-md:w-full max-md:min-w-0 max-md:flex-col max-md:items-stretch max-md:gap-8 md:w-max md:min-w-full md:flex-nowrap md:items-stretch md:justify-center gap-5 sm:gap-6 md:gap-8 px-4 sm:px-6">
           {products.map((product, i) => (
             <ProductCard key={product.id} product={product} index={i} navigate={navigate} />
           ))}
