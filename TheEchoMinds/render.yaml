@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: theechominds-api
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_URL
+        value: https://theechominds.com,https://www.theechominds.com

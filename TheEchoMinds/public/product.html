@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EchoLens Product Details</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0c10;
+      --bg-2: #161a22;
+      --card: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #f5f7fb;
+      --muted: #b7c0d3;
+      --accent: #8fd3ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(143, 211, 255, 0.12), transparent 60%),
+        radial-gradient(900px 600px at 90% 10%, rgba(255, 143, 201, 0.08), transparent 65%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px 72px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .title {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 600;
+      margin: 0 0 10px 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .cta:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .image-card {
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.3);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    .image-card img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      padding: 22px;
+      border-radius: 22px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+
+    .card h3 {
+      margin: 0 0 12px 0;
+      font-size: 1.1rem;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .meta {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: var(--muted);
+    }
+
+    .meta strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .footer {
+      margin-top: 42px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header>
+      <div>
+        <h1 class="title">EchoLens</h1>
+        <p class="subtitle">Product details, finishes, and everyday fit.</p>
+      </div>
+      <a class="cta" href="/">Back to home</a>
+    </header>
+
+    <section class="hero">
+      <div class="image-card">
+        <img
+          src="https://india.ray-ban.com/media/catalog/product/cache/c5a5bd13e2650a156913221dd914de35/0/r/0rw4012__601_1m_18.png"
+          alt="EchoLens product view" />
+      </div>
+      <div class="card">
+        <h3>Overview</h3>
+        <p>
+          EchoLens is built for all-day wear with a lightweight frame, balanced fit,
+          and subtle intelligence. Designed to blend in while keeping instant assistance
+          within reach.
+        </p>
+      </div>
+    </section>
+
+    <section class="details">
+      <div class="card">
+        <h3>Key Specs</h3>
+        <ul class="meta">
+          <li><strong>Weight:</strong> Featherlight, tuned for long sessions.</li>
+          <li><strong>Battery:</strong> Full-day power with fast top-ups.</li>
+          <li><strong>Audio:</strong> Directional spatial speakers.</li>
+          <li><strong>Controls:</strong> Touch + voice commands.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Included</h3>
+        <ul class="meta">
+          <li><strong>EchoLens</strong> smart glasses.</li>
+          <li><strong>Charging case</strong> with USB-C cable.</li>
+          <li><strong>Cleaning kit</strong> and protective pouch.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Finishes</h3>
+        <p>
+          Matte black, graphite, and midnight blue options with interchangeable nose
+          pads for a tailored fit.
+        </p>
+      </div>
+    </section>
+
+    <div class="footer">© 2026 TheEchoMinds. EchoLens.</div>
+  </div>
+</body>
+
+</html>

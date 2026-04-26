@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Nice default */
+html,
+body {
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+section {
+  transition: background 0.6s ease;
+}
+
+/* Blog horizontal strip: thin light scrollbar (WebKit + Firefox) */
+.blog-strip-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.blog-strip-scroll::-webkit-scrollbar {
+  height: 7px;
+}
+.blog-strip-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 9999px;
+}
+.blog-strip-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+}
+.blog-strip-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Product flow gallery: infinite vertical marquee (duplicated track = 50% loop) */
+@keyframes product-gallery-marquee-up {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+.product-gallery-track {
+  animation-name: product-gallery-marquee-up;
+  animation-duration: var(--pg-duration, 48s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+/* Soft vertical edges on the whole gallery grid (immersive blend) */
+.product-gallery-masked-grid {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 20%,
+    black 85%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 85%, transparent 100%);
+}
+
+.product-gallery-column:hover .product-gallery-track,
+.product-gallery-column:focus-within .product-gallery-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-gallery-track {
+    animation: none !important;
+    transform: none !important;
+  }
+}

@@ -1,0 +1,7 @@
+Put your background video here:
+
+- File: `public/videos/12778075_3840_2160_30fps.mp4`
+- Optional poster image: `public/videos/echolens-bg-poster.jpg`
+
+The app already references `/videos/echolens-bg.mp4` as a full-page looping background.
+
