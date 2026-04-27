@@ -6,6 +6,38 @@ import { generateOrderId } from "../utils/generateId.js";
 import { success, error } from "../utils/response.js";
 import { expectedOrderTotalInr } from "../lib/orderPricing.js";
 
+function parseShippingAddress(body) {
+  const raw = body?.shippingAddress;
+  if (!raw || typeof raw !== "object") {
+    return { error: "shippingAddress is required (full name, street, city, state, PIN)" };
+  }
+  const fullName = String(raw.fullName || "").trim();
+  const phone = String(raw.phone || "").trim();
+  const line1 = String(raw.line1 || "").trim();
+  const line2 = String(raw.line2 || "").trim();
+  const city = String(raw.city || "").trim();
+  const state = String(raw.state || "").trim();
+  const postalCode = String(raw.postalCode || "").trim();
+  const country = String(raw.country || "India").trim() || "India";
+  if (!fullName || !line1 || !city || !state || !postalCode) {
+    return {
+      error: "Shipping address must include full name, address line 1, city, state, and postal code",
+    };
+  }
+  return {
+    address: {
+      fullName,
+      phone,
+      line1,
+      line2,
+      city,
+      state,
+      postalCode,
+      country,
+    },
+  };
+}
+
 export async function createRazorpayOrderController(req, res) {
   try {
     const { product } = req.body;
@@ -44,6 +76,11 @@ export async function verifyPayment(req, res) {
       return error(res, "razorpayOrderId, razorpayPaymentId and razorpaySignature are required", 400);
     }
 
+    const parsedAddr = parseShippingAddress(req.body);
+    if (parsedAddr.error) {
+      return error(res, parsedAddr.error, 400);
+    }
+
     const isValid = verifyRazorpaySignature(
       razorpayOrderId,
       razorpayPaymentId,
@@ -68,6 +105,7 @@ export async function verifyPayment(req, res) {
       razorpayPaymentId,
       amount: authorizedInr,
       status: "processing",
+      shippingAddress: parsedAddr.address,
     });
 
     const user = await User.findById(userId).select("email").lean();

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,17 @@ const DEFAULT_PRODUCT = {
   name: "EchoLens G.1",
   model: "Lens G1",
   amount: 22595,
+};
+
+const EMPTY_SHIPPING = {
+  fullName: "",
+  phone: "",
+  line1: "",
+  line2: "",
+  city: "",
+  state: "",
+  postalCode: "",
+  country: "India",
 };
 
 function loadRazorpayScript() {
@@ -38,6 +49,9 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [cartLines, setCartLines] = useState([]);
+  const [shipping, setShipping] = useState(() => ({ ...EMPTY_SHIPPING }));
+  const shippingRef = useRef(shipping);
+  shippingRef.current = shipping;
 
   useEffect(() => {
     const st = location.state;
@@ -82,6 +96,18 @@ export default function CheckoutPage() {
   const handlePayment = useCallback(async () => {
     setError("");
     setSuccess("");
+    const addr = shippingRef.current;
+    const missing =
+      !String(addr.fullName || "").trim() ||
+      !String(addr.line1 || "").trim() ||
+      !String(addr.city || "").trim() ||
+      !String(addr.state || "").trim() ||
+      !String(addr.postalCode || "").trim();
+    if (missing) {
+      setError("Please fill in shipping: full name, street address, city, state, and postal code.");
+      return;
+    }
+
     setLoading(true);
     try {
       const productPayload =
@@ -117,6 +143,17 @@ export default function CheckoutPage() {
         description: product.name,
         handler: async (response) => {
           try {
+            const s = shippingRef.current;
+            const shippingAddress = {
+              fullName: String(s.fullName || "").trim(),
+              phone: String(s.phone || "").trim(),
+              line1: String(s.line1 || "").trim(),
+              line2: String(s.line2 || "").trim(),
+              city: String(s.city || "").trim(),
+              state: String(s.state || "").trim(),
+              postalCode: String(s.postalCode || "").trim(),
+              country: String(s.country || "India").trim() || "India",
+            };
             await apiFetch("/orders/verify", {
               method: "POST",
               body: JSON.stringify({
@@ -125,6 +162,7 @@ export default function CheckoutPage() {
                 razorpaySignature: response.razorpay_signature,
                 product: productPayload,
                 amount: payableInr,
+                shippingAddress,
               }),
             });
             clearCart();
@@ -167,7 +205,7 @@ export default function CheckoutPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md rounded-3xl border border-emerald-400/30 bg-black/55 backdrop-blur-lg p-8 space-y-6"
+          className="w-full max-w-xl rounded-3xl border border-emerald-400/30 bg-black/55 backdrop-blur-lg p-8 space-y-6"
         >
           <h1 className="text-3xl font-semibold">Checkout</h1>
           <p className="text-emerald-100 text-sm">Complete your purchase with Razorpay</p>
@@ -213,6 +251,97 @@ export default function CheckoutPage() {
             <p className="text-xl font-semibold border-t border-white/10 pt-3">
               Total ₹{product.amount.toLocaleString("en-IN")}
             </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/15 bg-white/5 p-6 space-y-4">
+            <h2 className="text-lg font-medium">Shipping address</h2>
+            <p className="text-gray-400 text-xs">We use this to fulfil your order after payment.</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block sm:col-span-2 space-y-1.5 text-sm">
+                <span className="text-gray-400">Full name</span>
+                <input
+                  type="text"
+                  autoComplete="name"
+                  value={shipping.fullName}
+                  onChange={(e) => setShipping((s) => ({ ...s, fullName: e.target.value }))}
+                  className="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  placeholder="As on ID / package"
+                />
+              </label>
+              <label className="block space-y-1.5 text-sm">
+                <span className="text-gray-400">Phone (optional)</span>
+                <input
+                  type="tel"
+                  autoComplete="tel"
+                  value={shipping.phone}
+                  onChange={(e) => setShipping((s) => ({ ...s, phone: e.target.value }))}
+                  className="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  placeholder="Delivery contact"
+                />
+              </label>
+              <label className="block sm:col-span-2 space-y-1.5 text-sm">
+                <span className="text-gray-400">Address line 1</span>
+                <input
+                  type="text"
+                  autoComplete="address-line1"
+                  value={shipping.line1}
+                  onChange={(e) => setShipping((s) => ({ ...s, line1: e.target.value }))}
+                  className="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  placeholder="House / flat, street"
+                />
+              </label>
+              <label className="block sm:col-span-2 space-y-1.5 text-sm">
+                <span className="text-gray-400">Address line 2 (optional)</span>
+                <input
+                  type="text"
+                  autoComplete="address-line2"
+                  value={shipping.line2}
+                  onChange={(e) => setShipping((s) => ({ ...s, line2: e.target.value }))}
+                  className="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  placeholder="Area, landmark"
+                />
+              </label>
+              <label className="block space-y-1.5 text-sm">
+                <span className="text-gray-400">City</span>
+                <input
+                  type="text"
+                  autoComplete="address-level2"
+                  value={shipping.city}
+                  onChange={(e) => setShipping((s) => ({ ...s, city: e.target.value }))}
+                  className="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                />
+              </label>
+              <label className="block space-y-1.5 text-sm">
+                <span className="text-gray-400">State</span>
+                <input
+                  type="text"
+                  autoComplete="address-level1"
+                  value={shipping.state}
+                  onChange={(e) => setShipping((s) => ({ ...s, state: e.target.value }))}
+                  className="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                />
+              </label>
+              <label className="block space-y-1.5 text-sm">
+                <span className="text-gray-400">Postal code</span>
+                <input
+                  type="text"
+                  autoComplete="postal-code"
+                  value={shipping.postalCode}
+                  onChange={(e) => setShipping((s) => ({ ...s, postalCode: e.target.value }))}
+                  className="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                />
+              </label>
+              <label className="block space-y-1.5 text-sm">
+                <span className="text-gray-400">Country</span>
+                <input
+                  type="text"
+                  autoComplete="country-name"
+                  value={shipping.country}
+                  onChange={(e) => setShipping((s) => ({ ...s, country: e.target.value }))}
+                  className="w-full rounded-xl border border-white/20 bg-black/40 px-3 py-2 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                />
+              </label>
+            </div>
           </div>
 
           {error && <p className="text-red-300 text-sm">{error}</p>}

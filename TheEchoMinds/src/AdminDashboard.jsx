@@ -23,6 +23,18 @@ const ROW_STATUS_OPTIONS = [
   { value: "refunded", label: "Refunded" },
 ];
 
+function shippingAddressLabel(a) {
+  if (!a || !String(a.line1 || "").trim()) return "";
+  const parts = [
+    a.fullName,
+    a.phone ? `Phone: ${a.phone}` : null,
+    [a.line1, a.line2].filter((x) => String(x || "").trim()).join(", "),
+    [a.city, a.state, a.postalCode].filter((x) => String(x || "").trim()).join(", "),
+    a.country,
+  ].filter(Boolean);
+  return parts.join("\n");
+}
+
 export default function AdminDashboard() {
   const { employee } = useEmployeeAuth();
   const [error, setError] = useState("");
@@ -214,12 +226,13 @@ export default function AdminDashboard() {
             <p className="text-sm text-zinc-500">No orders match this filter.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] text-left text-sm">
+              <table className="w-full min-w-[960px] text-left text-sm">
                 <thead>
                   <tr className="border-b border-white/10 text-xs uppercase tracking-wider text-zinc-500">
                     <th className="pb-3 pr-3">Date</th>
                     <th className="pb-3 pr-3">Order ID</th>
                     <th className="pb-3 pr-3">Customer</th>
+                    <th className="pb-3 pr-3">Ship to</th>
                     <th className="pb-3 pr-3">Amount</th>
                     <th className="pb-3 pr-3">Status</th>
                   </tr>
@@ -228,6 +241,7 @@ export default function AdminDashboard() {
                   {orders.map((o) => {
                     const u = o.userId;
                     const email = typeof u === "object" && u?.email ? u.email : "—";
+                    const shipText = shippingAddressLabel(o.shippingAddress);
                     return (
                       <tr key={o._id} className="align-top">
                         <td className="py-3 pr-3 text-zinc-400 whitespace-nowrap">
@@ -236,6 +250,12 @@ export default function AdminDashboard() {
                         <td className="py-3 pr-3 font-mono text-xs text-zinc-200">{o.orderId}</td>
                         <td className="py-3 pr-3 text-zinc-300 max-w-[200px] truncate" title={email}>
                           {email}
+                        </td>
+                        <td
+                          className="py-3 pr-3 text-zinc-300 text-xs max-w-[260px] whitespace-pre-wrap break-words"
+                          title={shipText || undefined}
+                        >
+                          {shipText || <span className="text-zinc-600">—</span>}
                         </td>
                         <td className="py-3 pr-3 whitespace-nowrap">₹{Number(o.amount || 0).toLocaleString("en-IN")}</td>
                         <td className="py-3 pr-3">

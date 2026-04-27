@@ -1,5 +1,19 @@
 import mongoose from "mongoose";
 
+const shippingAddressSchema = new mongoose.Schema(
+  {
+    fullName: { type: String, trim: true },
+    phone: { type: String, trim: true },
+    line1: { type: String, trim: true },
+    line2: { type: String, trim: true },
+    city: { type: String, trim: true },
+    state: { type: String, trim: true },
+    postalCode: { type: String, trim: true },
+    country: { type: String, trim: true, default: "India" },
+  },
+  { _id: false },
+);
+
 const orderSchema = new mongoose.Schema(
   {
     userId: {
@@ -33,6 +47,10 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: ["confirmed", "processing", "shipped", "delivered", "failed", "refunded"],
       default: "processing",
+    },
+    shippingAddress: {
+      type: shippingAddressSchema,
+      default: undefined,
     },
   },
   { timestamps: true },
